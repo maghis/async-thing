@@ -29,3 +29,7 @@ test("filter", async t => {
 test("count", async t => {
     t.deepEqual(await thing(sampleValues).count(), sampleValues.length);
 });
+
+test("reduce", async t => {
+    t.is(await thing(sampleValues).reduce((r, v) => r + 1, 0), sampleValues.length);
+});
