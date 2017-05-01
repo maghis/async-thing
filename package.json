@@ -1,11 +1,12 @@
 {
   "name": "async-thing",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "lib/index.js",
   "files": [
     "lib/"
   ],
+  "types": "lib/index.d.ts",
   "scripts": {
     "lint": "tslint src/**/*.ts",
     "lint:tests": "tslint test/**/*.ts",
