@@ -3,7 +3,7 @@ import registerShims from "./shims";
 
 registerShims();
 
-type AnyIterable<T> = AsyncThing<T> | AsyncIterable<T> | Iterable<T>;
+export type AnyIterable<T> = AsyncThing<T> | AsyncIterable<T> | Iterable<T>;
 
 function isAsyncThing<T>(iterable: AnyIterable<T>): iterable is AsyncThing<T> {
     return (iterable as any).isAsyncThing === true;
