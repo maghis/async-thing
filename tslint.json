@@ -1,0 +1,21 @@
+{
+  "extends": "tslint:latest",
+  "rules": {
+    "arrow-parens": false,
+    "max-line-length": [ false ],
+    "object-literal-sort-keys": false,
+    "one-line": [
+      false,
+      "check-else"
+    ],
+    "no-string-literal": false,
+    "no-consecutive-blank-lines": [
+      false
+    ],
+    "object-literal-shorthand": false,
+    "interface-name": [
+      true,
+      "never-prefix"
+    ]
+  }
+}

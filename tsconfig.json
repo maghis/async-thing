@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "lib": [ "es2017", "esnext.asynciterable" ],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./lib/",
+    "rootDir": "./src/",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2016"
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}

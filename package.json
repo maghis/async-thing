@@ -1,0 +1,42 @@
+{
+  "name": "async-thing",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "files": [
+    "lib/"
+  ],
+  "scripts": {
+    "lint": "tslint src/**/*.ts",
+    "lint:tests": "tslint test/**/*.ts",
+    "build": "npm run lint && tsc --pretty",
+    "build:tests": "npm run lint:tests && tsc --pretty -p test/",
+    "test": "npm run build && npm run build:tests && nyc ava --verbose test/lib/test"
+  },
+  "author": "Massimo Andreasi Bassi",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "7.0.14",
+    "ava": "0.19.1",
+    "nyc": "10.3.0",
+    "tslint": "5.1.0",
+    "typescript": "2.3.2"
+  },
+  "nyc": {
+    "include": [
+      "test/**"
+    ],
+    "exclude": [
+      "test/build/test/**"
+    ],
+    "reporter": [
+      "json",
+      "text",
+      "lcovonly"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "all": true
+  }
+}
