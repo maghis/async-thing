@@ -27,7 +27,7 @@
       "test/**"
     ],
     "exclude": [
-      "test/build/test/**"
+      "test/lib/test/**"
     ],
     "reporter": [
       "json",

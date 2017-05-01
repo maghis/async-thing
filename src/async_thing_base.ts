@@ -46,4 +46,8 @@ export class AsyncThingBase<T> implements AsyncIterable<T> {
             return acc;
         }, [] as T[]);
     }
+
+    public async count(): Promise<number> {
+        return await this.reduce((acc, _) => acc + 1, 0);
+    }
 }
