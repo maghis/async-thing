@@ -3,6 +3,24 @@ import registerShims from "./shims";
 
 registerShims();
 
+async function* concurrentMap<T, U>(iterable: AsyncIterable<T>, func: (item: T) => Promise<U> | U, concurrency: number) {
+    const inProgress: (Promise<U> | U)[] = [];
+    const iterator = iterable[Symbol.asyncIterator]();
+    while (true) {
+        let iteratorResult;
+        while (inProgress.length < concurrency
+            && !(iteratorResult = await iterator.next()).done) {
+            inProgress.push(func(iteratorResult.value));
+        }
+
+        if (inProgress.length === 0) {
+            break;
+        }
+
+        yield await inProgress.splice(0, 1)[0];
+    }
+}
+
 export class AsyncThingBase<T> implements AsyncIterable<T> {
     constructor(private getIterator: () => AsyncIterator<T>) { }
 
@@ -11,21 +29,26 @@ export class AsyncThingBase<T> implements AsyncIterable<T> {
         return ret;
     }
 
-    public map<U>(func: (item: T) => Promise<U> | U): AsyncThing<U> {
+    public map<U>(func: (item: T) => Promise<U>, concurrency?: number): AsyncThing<U>;
+    public map<U>(func: (item: T) => U): AsyncThing<U>;
+    public map<U>(func: (item: T) => Promise<U> | U, concurrency: number = 1): AsyncThing<U> {
         const iterable = this;
-        return new AsyncThing<U>(async function* map() {
-            for await (const item of iterable) {
-                yield await func(item);
-            }
-        });
+        return new AsyncThing<U>(() => concurrentMap(iterable, func, concurrency));
     }
 
-    public filter(expr: (item: T) => Promise<boolean> | boolean): AsyncThing<T> {
+    public filter(expr: (item: T) => Promise<boolean>, concurrency?: number): AsyncThing<T>;
+    public filter(expr: (item: T) => boolean): AsyncThing<T>;
+    public filter(expr: (item: T) => Promise<boolean> | boolean, concurrency: number = 1): AsyncThing<T> {
+        const mapper = async (item: T) => ({
+            item,
+            result: await expr(item),
+        });
+
         const iterable = this;
         return new AsyncThing<T>(async function* filter() {
-            for await (const item of iterable) {
-                if (await expr(item)) {
-                    yield item;
+            for await (const item of concurrentMap(iterable, mapper, concurrency)) {
+                if (item.result) {
+                    yield item.item;
                 }
             }
         });

@@ -3,15 +3,35 @@ import thing from "../src/index";
 
 const sampleValues = [1, 2, 3];
 
-test("map simple sync", async t => {
-    t.deepEqual(await thing(sampleValues).map(v => v * 2).toArray(), sampleValues.map(v => v * 2));
-});
-
-function wait(milliseconds: number): Promise<void> {
+function wait(milliseconds: number = 0): Promise<void> {
     return new Promise<void>(resolve => {
         setTimeout(() => resolve(), milliseconds);
     });
 }
+
+function testPromise<T>(value: T) {
+    let resolvePromise: (() => void) | undefined;
+    const promise = new Promise<void>(res => resolvePromise = res);
+    const ret = {
+        processing: false,
+        resolved: false,
+        resolve: async () => {
+            if (resolvePromise) { resolvePromise(); }
+            await wait(0);
+        },
+        awaitable: async () => {
+            ret.processing = true;
+            await promise;
+            ret.resolved = true;
+        },
+        value: value,
+    };
+    return ret;
+}
+
+test("map simple sync", async t => {
+    t.deepEqual(await thing(sampleValues).map(v => v * 2).toArray(), sampleValues.map(v => v * 2));
+});
 
 test("map async", async t => {
     const values = thing(sampleValues).map(async v => {
@@ -20,6 +40,73 @@ test("map async", async t => {
     });
 
     t.deepEqual(await values.toArray(), sampleValues.map(v => v * 2));
+});
+
+test("map concurrency 1", async t => {
+    const items = sampleValues.map(v => testPromise(v));
+    const resPromise = thing(items).map(async v => {
+        await v.awaitable();
+        return v.value;
+    }).toArray();
+
+    // let the event loop do 1 round
+    await wait(0);
+
+    // we should be blocked on the first
+    t.is(items[0].processing, true);
+    t.is(items[1].processing, false);
+
+    // resolve the first
+    await items[0].resolve();
+    t.is(items[0].resolved, true);
+    t.is(items[1].processing, true);
+    t.is(items[2].processing, false);
+
+    // resolve the last
+    await items[2].resolve();
+    t.is(items[1].resolved, false);
+    t.is(items[2].processing, false);
+
+    // resolve the second
+    await items[1].resolve();
+    t.is(items[1].resolved, true);
+    t.is(items[2].resolved, true);
+
+    t.deepEqual(await resPromise, sampleValues);
+});
+
+test("map concurrency 2", async t => {
+    const items = sampleValues.map(v => testPromise(v));
+    const resPromise = thing(items).map(async v => {
+        await v.awaitable();
+        return v.value;
+    }, 2).toArray();
+
+    // let the event loop do 1 round
+    await wait(0);
+
+    // we should be processing the first 2
+    t.is(items[0].processing, true);
+    t.is(items[1].processing, true);
+    t.is(items[2].processing, false);
+
+    // resolve the first
+    await items[0].resolve();
+    t.is(items[0].resolved, true);
+    t.is(items[1].processing, true);
+    t.is(items[2].processing, true);
+
+    // resolve the last
+    await items[2].resolve();
+    t.is(items[1].resolved, false);
+    t.is(items[2].resolved, true);
+
+    // resolve the second
+    await items[1].resolve();
+    t.is(items[1].resolved, true);
+    t.is(items[2].resolved, true);
+
+    t.deepEqual(await resPromise, sampleValues);
 });
 
 test("filter", async t => {

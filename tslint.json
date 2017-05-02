@@ -1,8 +1,12 @@
 {
   "extends": "tslint:latest",
   "rules": {
+    "array-type": [
+      false
+    ],
     "arrow-parens": false,
     "max-line-length": [ false ],
+    "no-conditional-assignment": false,
     "object-literal-sort-keys": false,
     "one-line": [
       false,
