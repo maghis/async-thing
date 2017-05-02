@@ -23,8 +23,9 @@ function testPromise<T>(value: T) {
             ret.processing = true;
             await promise;
             ret.resolved = true;
+
+            return value;
         },
-        value: value,
     };
     return ret;
 }
@@ -44,10 +45,7 @@ test("map async", async t => {
 
 test("map concurrency 1", async t => {
     const items = sampleValues.map(v => testPromise(v));
-    const resPromise = thing(items).map(async v => {
-        await v.awaitable();
-        return v.value;
-    }).toArray();
+    const resPromise = thing(items).map(async v => await v.awaitable()).toArray();
 
     // let the event loop do 1 round
     await wait(0);
@@ -77,10 +75,7 @@ test("map concurrency 1", async t => {
 
 test("map concurrency 2", async t => {
     const items = sampleValues.map(v => testPromise(v));
-    const resPromise = thing(items).map(async v => {
-        await v.awaitable();
-        return v.value;
-    }, 2).toArray();
+    const resPromise = thing(items).map(async v => await v.awaitable(), 2).toArray();
 
     // let the event loop do 1 round
     await wait(0);
