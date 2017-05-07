@@ -1,4 +1,4 @@
-import { AsyncThing } from "./async_thing";
+import { AsyncThing, thing } from "./async_thing";
 import registerShims from "./shims";
 
 registerShims();
@@ -49,6 +49,48 @@ export class AsyncThingBase<T> implements AsyncIterable<T> {
             for await (const item of concurrentMap(iterable, mapper, concurrency)) {
                 if (item.result) {
                     yield item.item;
+                }
+            }
+        });
+    }
+
+    public concat<U>(sequence: AsyncIterable<U> | Iterable<U>) {
+        const first = this;
+        const second = thing(sequence);
+        return new AsyncThing<T>(async function* concat() {
+            yield* first;
+            yield* second;
+        });
+    }
+
+    public take(count: number) {
+        if (count === 0) {
+            return AsyncThing.empty<T>();
+        }
+
+        const iterable = this;
+        return new AsyncThing<T>(async function* take() {
+            let taken = 0;
+            for await (const item of iterable) {
+                yield item;
+                if (++taken >= count) {
+                    break;
+                }
+            }
+        });
+    }
+
+    public skip(count: number) {
+        if (count === 0) {
+            return this;
+        }
+
+        const iterable = this;
+        return new AsyncThing<T>(async function* skip() {
+            let skipped = 0;
+            for await (const item of iterable) {
+                if (++skipped > count) {
+                    yield item;
                 }
             }
         });

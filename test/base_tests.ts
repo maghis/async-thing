@@ -36,7 +36,7 @@ test("map simple sync", async t => {
 
 test("map async", async t => {
     const values = thing(sampleValues).map(async v => {
-        await wait(100);
+        await wait(10);
         return v * 2;
     });
 
@@ -106,6 +106,28 @@ test("map concurrency 2", async t => {
 
 test("filter", async t => {
     t.deepEqual(await thing(sampleValues).filter(v => v > 1).toArray(), sampleValues.filter(v => v > 1));
+});
+
+test("concat", async t => {
+    const actual = await thing(sampleValues).concat(sampleValues.slice().reverse()).toArray();
+    t.deepEqual(actual, sampleValues.concat(sampleValues.slice().reverse()));
+});
+
+test("take", async t => {
+    const sample = thing(sampleValues);
+    t.is(await sample.take(0).count(), 0);
+
+    const take2 = sample.take(2);
+    t.is(await take2.count(), 2);
+    t.deepEqual(await take2.toArray(), sampleValues.slice(0, 2));
+});
+
+test("skip", async t => {
+    const sample = thing(sampleValues);
+    t.deepEqual(await sample.skip(0).toArray(), sampleValues);
+    t.is(await sample.skip(sampleValues.length).count(), 0);
+
+    t.deepEqual(await sample.skip(2).toArray(), sampleValues.slice(2));
 });
 
 test("count", async t => {

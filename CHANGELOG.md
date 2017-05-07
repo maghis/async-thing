@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Reduce by key: `reduceBy()`, `groupBy()`, `countBy()`
 - AsyncThing: `empty()`, `single()`
+- Sequence operations: `concat`, `take`, `skip`
 
 ## [0.1.0]
 ### Added
