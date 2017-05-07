@@ -115,3 +115,43 @@ test("count", async t => {
 test("reduce", async t => {
     t.is(await thing(sampleValues).reduce((r, v) => r + 1, 0), sampleValues.length);
 });
+
+test("reduceBy", async t => {
+    const someValues = [
+        "foo",
+        "bar",
+        "bar",
+        "baz",
+    ];
+
+    const counts = await thing(someValues).reduceBy(v => v, (r, v) => r + 1, 0);
+
+    t.is(counts["foo"], 1);
+    t.is(counts["bar"], 2);
+    t.is(counts["baz"], 1);
+});
+
+test("countBy", async t => {
+    const someValues = [
+        "foo",
+        "bar",
+        "bar",
+        "baz",
+    ];
+
+    const counts = await thing(someValues).countBy(v => v);
+
+    t.is(counts["foo"], 1);
+    t.is(counts["bar"], 2);
+    t.is(counts["baz"], 1);
+});
+
+test("groupBy", async t => {
+    const someValues = [1, 2, 3, 4];
+
+    const groups = await thing(someValues)
+        .groupBy(v => v % 2 ? "odd" : "even");
+
+    t.deepEqual(groups["odd"], [1, 3]);
+    t.deepEqual(groups["even"], [2, 4]);
+});

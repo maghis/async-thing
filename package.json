@@ -13,7 +13,7 @@
     "build": "npm run lint && tsc --pretty",
     "clean": "rm -rf lib/",
     "build:tests": "npm run lint && npm run lint:tests && tsc --pretty -p test/",
-    "clean:tests": "rm -rf tests/build/",
+    "clean:tests": "rm -rf test/build/",
     "test": "npm run build:tests && nyc ava --verbose test/build/test"
   },
   "author": "Massimo Andreasi Bassi",

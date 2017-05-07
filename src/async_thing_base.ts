@@ -63,6 +63,35 @@ export class AsyncThingBase<T> implements AsyncIterable<T> {
         return acc;
     }
 
+    public async reduceBy<U>(
+        selector: (item: T) => Promise<string> | string,
+        reduce: (acc: U, item: T) => Promise<U> | U,
+        init: (() => U) | U,
+    ): Promise<{ [key: string]: U }> {
+        const ret: { [key: string]: U } = {};
+        for await (const item of this) {
+            const key = await selector(item);
+            if (ret[key] === undefined) {
+                ret[key] = typeof init === "function" ? init() : init;
+            }
+
+            ret[key] = await reduce(ret[key], item);
+        }
+
+        return ret;
+    }
+
+    public async groupBy(selector: (item: T) => Promise<string> | string) {
+        return this.reduceBy(selector, (group, item) => {
+            group.push(item);
+            return group;
+        }, () => [] as T[]);
+    }
+
+    public async countBy(selector: (item: T) => Promise<string> | string) {
+        return this.reduceBy(selector, (count, _) => count + 1, 0);
+    }
+
     public async toArray(): Promise<T[]> {
         return await this.reduce((acc, item) => {
             acc.push(item);
