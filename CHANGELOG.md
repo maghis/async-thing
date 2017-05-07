@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
-- `reduceBy()`, `groupBy()`, `countBy()`
+- Reduce by key: `reduceBy()`, `groupBy()`, `countBy()`
+- AsyncThing: `empty()`, `single()`
 
 ## [0.1.0]
 ### Added
