@@ -1,5 +1,5 @@
 export default function register() {
-    (Symbol as any).asyncIterator = Symbol.asyncIterator !== undefined
-        ? Symbol.asyncIterator
-        : "__@@asyncIterator__";
+    if (typeof (Symbol as any).asyncIterator === "undefined") {
+        (Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol.for("Symbol.asyncIterator");
+    }
 }

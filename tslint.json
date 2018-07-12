@@ -8,6 +8,8 @@
     "max-line-length": [ false ],
     "no-conditional-assignment": false,
     "object-literal-sort-keys": false,
+    "no-this-assignment": false,
+    "no-object-literal-type-assertion": false,
     "one-line": [
       false,
       "check-else"

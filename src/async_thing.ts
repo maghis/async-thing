@@ -16,7 +16,7 @@ function isAsyncIterable<T>(iterable: AnyIterable<T>): iterable is AsyncIterable
 export class AsyncThing<T> extends AsyncThingMath<T> {
     public static empty<T>() {
         return new AsyncThing<T>((() => ({
-            next: () => Promise.resolve({ done: true }),
+            next: () => Promise.resolve({ done: true } as IteratorResult<T>),
         })));
     }
 
