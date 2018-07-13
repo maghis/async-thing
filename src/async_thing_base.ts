@@ -54,10 +54,10 @@ export class AsyncThingBase<T> implements AsyncIterable<T> {
         });
     }
 
-    public concat<U>(sequence: AsyncIterable<U> | Iterable<U>) {
+    public concat<U>(sequence: AsyncIterable<U> | Iterable<U>): AsyncThing<T | U> {
         const first = this;
         const second = thing(sequence);
-        return new AsyncThing<T>(async function* concat() {
+        return new AsyncThing<T | U>(async function* concat() {
             yield* first;
             yield* second;
         });
@@ -135,13 +135,13 @@ export class AsyncThingBase<T> implements AsyncIterable<T> {
     }
 
     public async toArray(): Promise<T[]> {
-        return await this.reduce((acc, item) => {
+        return this.reduce((acc, item) => {
             acc.push(item);
             return acc;
         }, [] as T[]);
     }
 
     public async count(): Promise<number> {
-        return await this.reduce((acc, _) => acc + 1, 0);
+        return this.reduce((acc, _) => acc + 1, 0);
     }
 }

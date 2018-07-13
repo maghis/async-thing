@@ -12,7 +12,7 @@ export class AsyncThingMath<T> extends AsyncThingBase<T> {
             selector = (i: any) => i as number;
         }
 
-        return await this.map(selector).reduce((acc, i) => acc + i, 0);
+        return this.map(selector).reduce((acc, i) => acc + i, 0);
     }
 
     public mean(this: AsyncThing<number>): Promise<number>;
