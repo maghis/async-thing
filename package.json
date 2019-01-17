@@ -9,10 +9,9 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "lint": "tslint src/**/*.ts",
-    "lint:tests": "tslint test/**/*.ts",
     "build": "npm run lint && tsc --pretty",
     "clean": "rm -rf lib/",
-    "build:tests": "npm run lint && npm run lint:tests && tsc --pretty -p test/",
+    "build:tests": "tsc --pretty -p test/",
     "clean:tests": "rm -rf test/build/",
     "test": "npm run build:tests && nyc ava --verbose test/build/test"
   },
